@@ -10,7 +10,9 @@ using QtNodes::PortType;
 
 NodeDataModel::
 NodeDataModel()
-  : _nodeStyle(StyleCollection::nodeStyle())
+  : _nodeStyle(StyleCollection::nodeStyle()),
+    _editable(true),
+    _movable(true)
 {
   // Derived classes can initialize specific style here
 }
@@ -23,6 +25,8 @@ save() const
   QJsonObject modelJson;
 
   modelJson["name"] = name();
+  modelJson["editable"] = editable();
+  modelJson["movable"] = movable();
 
   // if ports are dynamics, write their value when saved.
   // when restored, model need to update the dynamic value.
@@ -38,6 +42,14 @@ save() const
   }
 
   return modelJson;
+}
+
+void
+NodeDataModel::
+restore(const QJsonObject& object)
+{
+  setEditable(object["editable"].toBool(true));
+  setMovable(object["movable"].toBool(true));
 }
 
 
@@ -97,4 +109,38 @@ setInData(std::vector<std::shared_ptr<NodeData> > nodeData, PortIndex port)
   {
     Q_ASSERT(false);
   }
+}
+
+
+bool
+NodeDataModel::
+editable() const
+{
+  return _editable;
+}
+
+
+void
+NodeDataModel::
+setEditable(bool editable)
+{
+  _editable = editable;
+  Q_EMIT editableChanged(editable);
+}
+
+
+bool
+NodeDataModel::
+movable() const
+{
+  return _movable;
+}
+
+
+void
+NodeDataModel::
+setMovable(bool movable)
+{
+  _movable = movable;
+  Q_EMIT movableChanged(movable);
 }

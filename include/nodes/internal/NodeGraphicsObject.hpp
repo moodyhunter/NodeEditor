@@ -55,6 +55,18 @@ public:
   void
   lock(bool locked);
 
+  bool
+  movable() const;
+
+  void
+  setMovable(bool movable);
+
+  bool
+  editable() const;
+
+  void
+  setEditable(bool editable);
+
 protected:
   void
   paint(QPainter*                       painter,
@@ -99,6 +111,8 @@ private:
   Node& _node;
 
   bool _locked;
+  bool _movable;
+  bool _editable;
 
   // either nullptr or owned by parent QGraphicsItem
   QGraphicsProxyWidget * _proxyWidget;

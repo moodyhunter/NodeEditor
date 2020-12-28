@@ -59,6 +59,11 @@ public:
 
   Node&createNode(std::unique_ptr<NodeDataModel> && dataModel);
 
+  /// Try create a node from a model name. If node is created a pointer to it is returned,
+  /// otherwise is nullptr. The model name should be already registerd with the DataModelRegistry
+  /// to the scene.
+  Node* createNode(const QString& modelName, const QPointF& point=QPointF(0.0, 0.0));
+
   Node&restoreNode(QJsonObject const& nodeJson);
 
   void removeNode(Node& node);

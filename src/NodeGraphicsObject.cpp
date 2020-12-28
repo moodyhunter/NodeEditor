@@ -28,14 +28,16 @@ NodeGraphicsObject(FlowScene &scene,
   : _scene(scene)
   , _node(node)
   , _locked(false)
+  , _movable(true)
+  , _editable(true)
   , _proxyWidget(nullptr)
 {
   _scene.addItem(this);
 
   setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
-  setFlag(QGraphicsItem::ItemIsMovable, true);
-  setFlag(QGraphicsItem::ItemIsFocusable, true);
-  setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setFlag(QGraphicsItem::ItemIsMovable, _movable);
+  setFlag(QGraphicsItem::ItemIsFocusable, _editable);
+  setFlag(QGraphicsItem::ItemIsSelectable, _editable);
   setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
 
   setCacheMode( QGraphicsItem::DeviceCoordinateCache );
@@ -165,16 +167,39 @@ lock(bool locked)
 {
   _locked = locked;
 
-  setFlag(QGraphicsItem::ItemIsMovable, !locked);
-  setFlag(QGraphicsItem::ItemIsFocusable, !locked);
-  setFlag(QGraphicsItem::ItemIsSelectable, !locked);
+  setFlag(QGraphicsItem::ItemIsMovable, !_locked && _movable);
+  setFlag(QGraphicsItem::ItemIsFocusable, !_locked && _editable);
+  setFlag(QGraphicsItem::ItemIsSelectable, !_locked && _editable);
+}
+
+bool NodeGraphicsObject::movable() const
+{
+  return !_locked && _movable;
+}
+
+void NodeGraphicsObject::setMovable(bool movable)
+{
+  _movable = movable;
+  setFlag(QGraphicsItem::ItemIsMovable, !_locked && _movable);
+}
+
+bool NodeGraphicsObject::editable() const
+{
+  return _locked && _editable;
+}
+
+void NodeGraphicsObject::setEditable(bool editable)
+{
+  _editable = editable;
+  setFlag(QGraphicsItem::ItemIsFocusable, !_locked && _editable);
+  setFlag(QGraphicsItem::ItemIsSelectable, !_locked && _editable);
 }
 
 
 void
 NodeGraphicsObject::
-paint(QPainter * painter,
-      QStyleOptionGraphicsItem const* option,
+  paint(QPainter * painter,
+        QStyleOptionGraphicsItem const* option,
       QWidget* )
 {
   painter->setClipRect(option->exposedRect);

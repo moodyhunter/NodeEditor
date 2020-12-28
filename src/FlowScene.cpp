@@ -210,6 +210,20 @@ createNode(std::unique_ptr<NodeDataModel> && dataModel)
   return *nodePtr;
 }
 
+Node*
+FlowScene::
+createNode(const QString& modelName, const QPointF& point)
+{
+  if(auto model = registry().create(modelName))
+  {
+    auto& node = createNode(std::move(model));
+    node.nodeGraphicsObject().setPos(point);
+    return &node;
+  }
+
+  return nullptr;
+}
+
 
 Node&
 FlowScene::
@@ -226,16 +240,10 @@ restoreNode(QJsonObject const& nodeJson)
   // restore data model before the node, to be able to restore dynamic ports.
   dataModel->restore(nodeJson["model"].toObject());
 
-  // create a node with uuid taken from json
-  auto node = detail::make_unique<Node>(std::move(dataModel), QUuid(nodeJson["id"].toString()));
-
-  // create node graphics object
+  auto node = detail::make_unique<Node>(std::move(dataModel));
   auto ngo  = detail::make_unique<NodeGraphicsObject>(*this, *node);
-  QJsonObject positionJson = nodeJson["position"].toObject();
-  QPointF point(positionJson["x"].toDouble(), positionJson["y"].toDouble());
-  ngo->setPos(point);
-
   node->setGraphicsObject(std::move(ngo));
+  node->restore(nodeJson);
 
   auto nodePtr = node.get();
   _nodes[node->id()] = std::move(node);

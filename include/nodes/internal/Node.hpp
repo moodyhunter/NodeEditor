@@ -112,6 +112,12 @@ public Q_SLOTS: // data propagation
   void
   onPortRemoved(PortType portType, PortIndex index);
 
+  void
+  onEditableChanged(bool changed);
+
+  void
+  onMovableChanged(bool movable);
+
 Q_SIGNALS:
 
   void

@@ -63,6 +63,9 @@ public:
   QJsonObject
   save() const override;
 
+  void
+  restore(const QJsonObject& object) override;
+
 public:
 
   virtual
@@ -147,6 +150,24 @@ public:
   NodePainterDelegate*
   painterDelegate() const { return nullptr; }
 
+  /// Return true if the datamodel is editable.
+  bool
+  editable() const;
+
+  /// Set if datamodel is editable. A datamodel not editable cannot
+  /// selected or deleted from scene.
+  void
+  setEditable(bool editable);
+
+  /// Return true if the datamodel is movable.
+  bool
+  movable() const;
+
+  /// Set if datamodel is movable. A datamodel not movable cannot
+  /// moved from its original position from scene.
+  void
+  setMovable(bool movable);
+
 public Q_SLOTS:
 
   virtual void
@@ -187,8 +208,19 @@ Q_SIGNALS:
   void
   portRemoved(PortType type, PortIndex index);
 
+  void
+  editableChanged(bool);
+
+  void
+  movableChanged(bool);
+
 private:
 
   NodeStyle _nodeStyle;
+
+  bool _editable;
+
+  bool _movable;
+
 };
 }

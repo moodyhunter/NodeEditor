@@ -53,8 +53,14 @@ Node(std::unique_ptr<NodeDataModel> && dataModel, QUuid&& uuid)
 
   connect(_nodeDataModel.get(), &NodeDataModel::portRemoved,
           this, &Node::onPortRemoved);
-}
 
+  connect(_nodeDataModel.get(), &NodeDataModel::editableChanged,
+          this, &Node::onEditableChanged);
+
+  connect(_nodeDataModel.get(), &NodeDataModel::movableChanged,
+          this, &Node::onMovableChanged);
+
+}
 
 Node::
 ~Node() = default;
@@ -356,4 +362,18 @@ onPortRemoved(PortType portType, PortIndex index)
   eraseEntry(portType, index);
 
   updateGraphics();
+}
+
+void
+Node::
+onEditableChanged(bool editable)
+{
+  _nodeGraphicsObject->setEditable(editable);
+}
+
+void
+Node::
+onMovableChanged(bool movable)
+{
+  _nodeGraphicsObject->setMovable(movable);
 }
