@@ -31,6 +31,10 @@ jobs:
         version: ${{ matrix.qt_version }}
         aqtversion: ==1.2.2 # miurahr/aqtinstall#288
 
+    - name: Install MSVC compiler
+      if: matrix.platform == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+
     # QTBUG-95391
     - name: Install Vulkan SDK
       if: matrix.platform != 'macos-latest'
