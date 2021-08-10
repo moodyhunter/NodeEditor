@@ -1,4 +1,3 @@
-find_package(Catch2 2.3.0 REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Test)
 
 add_executable(test_nodes

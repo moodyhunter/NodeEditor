@@ -7,6 +7,10 @@ cmake_policy(SET CMP0072 NEW)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 get_directory_property(_has_parent PARENT_DIRECTORY)
 if(_has_parent)
   set(is_root_project OFF)
@@ -36,8 +40,6 @@ endif()
 if(BUILD_DEBUG_POSTFIX_D)
   set(CMAKE_DEBUG_POSTFIX d)
 endif()
-
-add_subdirectory(external)
 
 if(QT_VERSION_MAJOR)
     message(STATUS "Using specified Qt version " ${QT_VERSION_MAJOR})
@@ -173,7 +175,14 @@ endif()
 ##
 
 if(BUILD_TESTING)
-  add_subdirectory(test)
+    if(NOT TARGET Catch2)
+        find_package(Catch2 2.3.0 QUIET)
+    endif()
+
+    if(NOT Catch2_FOUND)
+        add_subdirectory(external/Catch2)
+    endif()
+    add_subdirectory(test)
 endif()
 
 ###############
