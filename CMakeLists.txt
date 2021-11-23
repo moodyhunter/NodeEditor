@@ -22,6 +22,11 @@ option(BUILD_SHARED_LIBS "Build as shared library" ON)
 option(BUILD_DEBUG_POSTFIX_D "Append d suffix to debug libraries" OFF)
 option(NE_FORCE_TEST_COLOR "Force colorized unit test output" OFF)
 
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 enable_testing()
 
 if(NE_DEVELOPER_DEFAULTS)
@@ -39,59 +44,37 @@ endif()
 
 add_subdirectory(external)
 
-if(QT_VERSION_MAJOR)
-    message(STATUS "Using specified Qt version " ${QT_VERSION_MAJOR})
-else()
-    find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Widgets REQUIRED)
-    message(STATUS "Using Qt" ${QT_VERSION_MAJOR})
-endif()
+find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED CONFIG)
 
-# Find the QtWidgets library
-find_package(Qt${QT_VERSION_MAJOR} 5.10 COMPONENTS
-             Core
-             Widgets
-             Gui)
-
-if(${QT_VERSION_MAJOR} LESS 6)
-    qt5_add_resources(RESOURCES ./resources/nodeeditor.qrc)
-else()
-    qt_add_resources(RESOURCES ./resources/nodeeditor.qrc)
-endif()
-
-# Unfortunately, as we have a split include/src, AUTOMOC doesn't work.
-# We'll have to manually specify some files
-set(CMAKE_AUTOMOC ON)
+qt_add_resources(RESOURCES ./resources/nodeeditor.qrc)
 
 set(CPP_SOURCE_FILES
-  src/Connection.cpp
-  src/ConnectionBlurEffect.cpp
-  src/ConnectionGeometry.cpp
-  src/ConnectionGraphicsObject.cpp
-  src/ConnectionPainter.cpp
-  src/ConnectionState.cpp
-  src/ConnectionStyle.cpp
-  src/DataModelRegistry.cpp
-  src/FlowScene.cpp
-  src/FlowView.cpp
-  src/FlowViewStyle.cpp
-  src/Node.cpp
-  src/NodeConnectionInteraction.cpp
-  src/NodeDataModel.cpp
-  src/NodeGeometry.cpp
-  src/NodeGraphicsObject.cpp
-  src/NodePainter.cpp
-  src/NodeState.cpp
-  src/NodeStyle.cpp
-  src/Properties.cpp
-  src/StyleCollection.cpp
+    src/Connection.cpp
+    src/ConnectionBlurEffect.cpp
+    src/ConnectionGeometry.cpp
+    src/ConnectionGraphicsObject.cpp
+    src/ConnectionPainter.cpp
+    src/ConnectionState.cpp
+    src/ConnectionStyle.cpp
+    src/DataModelRegistry.cpp
+    src/FlowScene.cpp
+    src/FlowView.cpp
+    src/FlowViewStyle.cpp
+    src/Node.cpp
+    src/NodeConnectionInteraction.cpp
+    src/NodeDataModel.cpp
+    src/NodeGeometry.cpp
+    src/NodeGraphicsObject.cpp
+    src/NodePainter.cpp
+    src/NodeState.cpp
+    src/NodeStyle.cpp
+    src/Properties.cpp
+    src/StyleCollection.cpp
 )
 
 # If we want to give the option to build a static library,
 # set BUILD_SHARED_LIBS option to OFF
-add_library(nodes
-  ${CPP_SOURCE_FILES}
-  ${RESOURCES}
-)
+add_library(nodes ${CPP_SOURCE_FILES} ${RESOURCES})
 add_library(NodeEditor::nodes ALIAS nodes)
 
 target_include_directories(nodes
@@ -105,9 +88,9 @@ target_include_directories(nodes
 
 target_link_libraries(nodes
   PUBLIC
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Gui
+    Qt::Core
+    Qt::Widgets
+    Qt::Gui
 )
 
 target_compile_definitions(nodes
@@ -119,18 +102,6 @@ target_compile_definitions(nodes
     QT_NO_KEYWORDS
 )
 
-target_compile_options(nodes
-  PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 /wd4127 /EHsc>
-    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra>
-    $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra>
-)
-
-target_compile_features(nodes
-  PUBLIC
-    cxx_generic_lambdas # Require C++14
-)
-
 set_target_properties(nodes
   PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
@@ -138,74 +109,50 @@ set_target_properties(nodes
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-######
-# Moc
-##
-
 file(GLOB_RECURSE HEADERS_TO_MOC include/nodes/internal/*.hpp)
 
-if(${QT_VERSION_MAJOR} LESS 6)
-    qt5_wrap_cpp(nodes_moc
-        ${HEADERS_TO_MOC}
-      TARGET nodes
-      OPTIONS --no-notes # Don't display a note for the headers which don't produce a moc_*.cpp
-    )
-else()
-    qt_wrap_cpp(nodes_moc
-        ${HEADERS_TO_MOC}
-      TARGET nodes
-      OPTIONS --no-notes # Don't display a note for the headers which don't produce a moc_*.cpp
-    )
-endif()
+qt_wrap_cpp(nodes_moc
+    ${HEADERS_TO_MOC}
+    TARGET nodes
+    OPTIONS --no-notes # Don't display a note for the headers which don't produce a moc_*.cpp
+)
 
 target_sources(nodes PRIVATE ${nodes_moc})
 
-###########
-# Examples
-##
-
 if(BUILD_EXAMPLES)
-  add_subdirectory(examples)
+    add_subdirectory(examples)
 endif()
-
-##################
-# Automated Tests
-##
 
 if(BUILD_TESTING)
-  add_subdirectory(test)
+    add_subdirectory(test)
 endif()
-
-###############
-# Installation
-##
 
 include(GNUInstallDirs)
 
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/NodeEditor)
 
 install(TARGETS nodes
-  EXPORT NodeEditorTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    EXPORT NodeEditorTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(EXPORT NodeEditorTargets
-  FILE NodeEditorTargets.cmake
-  NAMESPACE NodeEditor::
-  DESTINATION ${INSTALL_CONFIGDIR}
+    FILE NodeEditorTargets.cmake
+    NAMESPACE NodeEditor::
+    DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/NodeEditorConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
-  INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
-  DESTINATION ${INSTALL_CONFIGDIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
+    DESTINATION ${INSTALL_CONFIGDIR}
 )
