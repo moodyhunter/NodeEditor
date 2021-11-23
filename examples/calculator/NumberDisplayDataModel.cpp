@@ -2,103 +2,78 @@
 
 #include "DecimalData.hpp"
 
-NumberDisplayDataModel::
-NumberDisplayDataModel()
-  : _label(nullptr)
+NumberDisplayDataModel::NumberDisplayDataModel() : _label(nullptr)
 {
 }
 
-
-unsigned int
-NumberDisplayDataModel::
-nPorts(PortType portType) const
+unsigned int NumberDisplayDataModel::nPorts(PortType portType) const
 {
-  unsigned int result = 1;
+    unsigned int result = 1;
 
-  switch (portType)
-  {
-    case PortType::In:
-      result = 1;
-      break;
+    switch (portType)
+    {
+        case PortType::In: result = 1; break;
 
-    case PortType::Out:
-      result = 0;
+        case PortType::Out: result = 0;
 
-    default:
-      break;
-  }
+        default: break;
+    }
 
-  return result;
+    return result;
 }
 
-
-NodeDataType
-NumberDisplayDataModel::
-dataType(PortType, PortIndex) const
+NodeDataType NumberDisplayDataModel::dataType(PortType, PortIndex) const
 {
-  return DecimalData().type();
+    return DecimalData().type();
 }
 
-
-std::shared_ptr<NodeData>
-NumberDisplayDataModel::
-outData(PortIndex)
+std::shared_ptr<NodeData> NumberDisplayDataModel::outData(PortIndex)
 {
-  std::shared_ptr<NodeData> ptr;
-  return ptr;
+    std::shared_ptr<NodeData> ptr;
+    return ptr;
 }
 
-
-void
-NumberDisplayDataModel::
-setInData(std::shared_ptr<NodeData> data, int)
+void NumberDisplayDataModel::setInData(std::shared_ptr<NodeData> data, int)
 {
-  auto numberData = std::dynamic_pointer_cast<DecimalData>(data);
+    auto numberData = std::dynamic_pointer_cast<DecimalData>(data);
 
-  if (numberData && numberData->isValid())
-  {
-    modelValidationState = NodeValidationState::Valid;
-    modelValidationError = QString();
-    Q_EMIT updateLabel(numberData->numberAsText());
-  }
-  else
-  {
-    modelValidationState = NodeValidationState::Warning;
-    modelValidationError = QStringLiteral("Missing or incorrect inputs");
-    Q_EMIT updateLabel("");
-  }
+    if (numberData && numberData->isValid())
+    {
+        modelValidationState = NodeValidationState::Valid;
+        modelValidationError = QString();
+        Q_EMIT updateLabel(numberData->numberAsText());
+    }
+    else
+    {
+        modelValidationState = NodeValidationState::Warning;
+        modelValidationError = QStringLiteral("Missing or incorrect inputs");
+        Q_EMIT updateLabel("");
+    }
 }
 
-QWidget*
-NumberDisplayDataModel::
-embeddedWidget()
+QWidget *NumberDisplayDataModel::embeddedWidget()
 {
-   if (!_label)
-   {
-      _label = new QLabel();
-      _label->setMargin(3);
-      connect(this, &NumberDisplayDataModel::updateLabel,
-              _label, [this](const QString& text){
-                _label->setText(text);
-                _label->adjustSize();
-              });
-   }
+    if (!_label)
+    {
+        _label = new QLabel();
+        _label->setMargin(3);
+        connect(this, &NumberDisplayDataModel::updateLabel, _label,
+                [this](const QString &text)
+                {
+                    _label->setText(text);
+                    _label->adjustSize();
+                });
+    }
 
-   return _label;
+    return _label;
 }
 
-
-NodeValidationState
-NumberDisplayDataModel::
-   validationState() const
+NodeValidationState NumberDisplayDataModel::validationState() const
 {
-  return modelValidationState;
+    return modelValidationState;
 }
 
-
-QString
-NumberDisplayDataModel::
-validationMessage() const
+QString NumberDisplayDataModel::validationMessage() const
 {
-  return modelValidationError;
+    return modelValidationError;
 }

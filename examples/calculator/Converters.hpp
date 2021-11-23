@@ -1,9 +1,9 @@
 #pragma once
 
-#include <nodes/TypeConverter>
-
 #include "DecimalData.hpp"
 #include "IntegerData.hpp"
+
+#include <nodes/TypeConverter>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
@@ -11,26 +11,19 @@ using QtNodes::NodeDataType;
 class DecimalToIntegerConverter
 {
 
-public:
+  public:
+    std::shared_ptr<NodeData> operator()(std::shared_ptr<NodeData> data);
 
-  std::shared_ptr<NodeData>
-  operator()(std::shared_ptr<NodeData> data);
-
-private:
-
-  std::shared_ptr<NodeData> _integer;
+  private:
+    std::shared_ptr<NodeData> _integer;
 };
-
 
 class IntegerToDecimalConverter
 {
 
-public:
+  public:
+    std::shared_ptr<NodeData> operator()(std::shared_ptr<NodeData> data);
 
-  std::shared_ptr<NodeData>
-  operator()(std::shared_ptr<NodeData> data);
-
-private:
-
-  std::shared_ptr<NodeData> _decimal;
+  private:
+    std::shared_ptr<NodeData> _decimal;
 };

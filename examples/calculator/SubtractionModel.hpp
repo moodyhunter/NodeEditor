@@ -4,25 +4,24 @@
 
 class SubtractionModel : public MathOperationDataModel
 {
-public:
+  public:
+    QString caption() const override
+    {
+        return QStringLiteral("Subtraction");
+    }
 
-  QString
-  caption() const override
-  { return QStringLiteral("Subtraction"); }
+    virtual bool portCaptionVisible(PortType, PortIndex) const override
+    {
+        return true;
+    }
 
-  virtual bool
-  portCaptionVisible(PortType, PortIndex) const override
-  { return true; }
+    virtual QString portCaption(PortType portType, PortIndex portIndex) const override;
 
-  virtual QString
-  portCaption(PortType portType, PortIndex portIndex) const override;
+    QString name() const override
+    {
+        return QStringLiteral("Subtraction");
+    }
 
-  QString
-  name() const override
-  { return QStringLiteral("Subtraction"); }
-
-private:
-
-  void
-  compute() override;
+  private:
+    void compute() override;
 };

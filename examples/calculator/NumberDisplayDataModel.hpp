@@ -1,71 +1,60 @@
 #pragma once
 
 #include <QtWidgets/QLabel>
-
+#include <iostream>
 #include <nodes/NodeDataModel>
 
-#include <iostream>
-
-using QtNodes::PortType;
-using QtNodes::PortIndex;
 using QtNodes::NodeData;
-using QtNodes::NodeDataType;
 using QtNodes::NodeDataModel;
+using QtNodes::NodeDataType;
 using QtNodes::NodeValidationState;
-
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 class NumberDisplayDataModel : public NodeDataModel
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  NumberDisplayDataModel();
+  public:
+    NumberDisplayDataModel();
 
-public:
+  public:
+    QString caption() const override
+    {
+        return QStringLiteral("Result");
+    }
 
-  QString
-  caption() const override
-  { return QStringLiteral("Result"); }
+    bool captionVisible() const override
+    {
+        return false;
+    }
 
-  bool
-  captionVisible() const override
-  { return false; }
+    QString name() const override
+    {
+        return QStringLiteral("Result");
+    }
 
-  QString
-  name() const override
-  { return QStringLiteral("Result"); }
+  public:
+    unsigned int nPorts(PortType portType) const override;
 
-public:
+    NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
 
-  unsigned int
-  nPorts(PortType portType) const override;
+    std::shared_ptr<NodeData> outData(PortIndex port) override;
 
-  NodeDataType
-  dataType(PortType portType, PortIndex portIndex) const override;
+    void setInData(std::shared_ptr<NodeData> data, int) override;
 
-  std::shared_ptr<NodeData>
-  outData(PortIndex port) override;
+    QWidget *embeddedWidget() override;
 
-  void
-  setInData(std::shared_ptr<NodeData> data, int) override;
+    NodeValidationState validationState() const override;
 
-  QWidget *
-  embeddedWidget() override;
+    QString validationMessage() const override;
 
-  NodeValidationState
-  validationState() const override;
+  signals:
+    void updateLabel(QString);
 
-  QString
-  validationMessage() const override;
+  private:
+    NodeValidationState modelValidationState = NodeValidationState::Warning;
+    QString modelValidationError = QStringLiteral("Missing or incorrect inputs");
 
-signals:
-  void
-  updateLabel(QString);
-
-private:
-
-  NodeValidationState modelValidationState = NodeValidationState::Warning;
-  QString modelValidationError = QStringLiteral("Missing or incorrect inputs");
-
-  QLabel * _label;
+    QLabel *_label;
 };

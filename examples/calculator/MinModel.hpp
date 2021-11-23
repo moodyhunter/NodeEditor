@@ -1,15 +1,15 @@
 #pragma once
 
-#include <nodes/NodeDataModel>
-
 #include "DecimalData.hpp"
 
-using QtNodes::PortType;
-using QtNodes::PortIndex;
+#include <nodes/NodeDataModel>
+
 using QtNodes::NodeData;
-using QtNodes::NodeDataType;
 using QtNodes::NodeDataModel;
+using QtNodes::NodeDataType;
 using QtNodes::NodeValidationState;
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 /*
  * This model has the purpose of showing a model with dynamic input ports.
@@ -17,63 +17,47 @@ using QtNodes::NodeValidationState;
 
 class MinModel : public NodeDataModel
 {
-   Q_OBJECT
+    Q_OBJECT
 
-public:
+  public:
+    unsigned int nPorts(PortType portType) const override;
 
-  unsigned int
-  nPorts(PortType portType) const override;
+    bool hasDynamicPorts(PortType portType) const override;
 
-  bool
-  hasDynamicPorts(PortType portType) const override;
+    NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
 
-  NodeDataType
-  dataType(PortType portType, PortIndex portIndex) const override;
+    std::shared_ptr<NodeData> outData(PortIndex port) override;
 
-  std::shared_ptr<NodeData>
-  outData(PortIndex port) override;
+    void setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) override;
 
-  void
-  setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) override;
+  public:
+    QString caption() const override;
 
-public:
+    bool portCaptionVisible(PortType portType, PortIndex portIndex) const override;
 
-  QString
-  caption() const override;
+    QString portCaption(PortType portType, PortIndex portIndex) const override;
 
-  bool
-  portCaptionVisible(PortType portType, PortIndex portIndex) const override;
+    QString name() const override;
 
-  QString
-  portCaption(PortType portType, PortIndex portIndex) const override;
+  public:
+    QWidget *embeddedWidget() override
+    {
+        return nullptr;
+    }
 
-  QString
-  name() const override;
+    NodeValidationState validationState() const override;
 
-public:
+    QString validationMessage() const override;
 
-  QWidget *
-  embeddedWidget() override { return nullptr; }
+  private:
+    void restore(const QJsonObject &obj) override;
 
-  NodeValidationState
-  validationState() const override;
+    void compute();
 
-  QString
-  validationMessage() const override;
+  private:
+    std::vector<std::weak_ptr<DecimalData>> _numberList;
+    std::shared_ptr<DecimalData> _result;
 
-private:
-
-  void
-  restore(const QJsonObject& obj) override;
-
-  void
-  compute();
-
-private:
-
-   std::vector<std::weak_ptr<DecimalData>> _numberList;
-   std::shared_ptr<DecimalData> _result;
-
-   NodeValidationState _modelValidationState = NodeValidationState::Warning;
-   QString _modelValidationError = QString("Missing or incorrect inputs");
+    NodeValidationState _modelValidationState = NodeValidationState::Warning;
+    QString _modelValidationError = QString("Missing or incorrect inputs");
 };

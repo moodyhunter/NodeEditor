@@ -4,18 +4,17 @@
 
 class MultiplicationModel : public MathOperationDataModel
 {
-public:
+  public:
+    QString caption() const override
+    {
+        return QStringLiteral("Multiplication");
+    }
 
-  QString
-  caption() const override
-  { return QStringLiteral("Multiplication"); }
+    QString name() const override
+    {
+        return QStringLiteral("Multiplication");
+    }
 
-  QString
-  name() const override
-  { return QStringLiteral("Multiplication"); }
-
-private:
-
-  void
-  compute() override;
+  private:
+    void compute() override;
 };

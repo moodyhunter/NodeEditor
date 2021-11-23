@@ -1,16 +1,16 @@
 #pragma once
 
-#include <nodes/NodeDataModel>
-#include <nodes/Connection>
-
 #include "DecimalData.hpp"
 
-using QtNodes::PortType;
-using QtNodes::PortIndex;
+#include <nodes/Connection>
+#include <nodes/NodeDataModel>
+
 using QtNodes::NodeData;
-using QtNodes::NodeDataType;
 using QtNodes::NodeDataModel;
+using QtNodes::NodeDataType;
 using QtNodes::NodeValidationState;
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 /*
  * This model has the purpose of showing a node with dynamic output ports.
@@ -18,65 +18,50 @@ using QtNodes::NodeValidationState;
 
 class FibonacciModel : public NodeDataModel
 {
-   Q_OBJECT
+    Q_OBJECT
 
-public:
-  FibonacciModel();
+  public:
+    FibonacciModel();
 
-  unsigned int
-  nPorts(PortType portType) const override;
+    unsigned int nPorts(PortType portType) const override;
 
-  bool
-  hasDynamicPorts(PortType portType) const override;
+    bool hasDynamicPorts(PortType portType) const override;
 
-  NodeDataType
-  dataType(PortType portType, PortIndex portIndex) const override;
+    NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
 
-  std::shared_ptr<NodeData>
-  outData(PortIndex port) override;
+    std::shared_ptr<NodeData> outData(PortIndex port) override;
 
-  void
-  setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) override;
+    void setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) override;
 
-public:
+  public:
+    QString caption() const override;
 
-  QString
-  caption() const override;
+    bool portCaptionVisible(PortType portType, PortIndex portIndex) const override;
 
-  bool
-  portCaptionVisible(PortType portType, PortIndex portIndex) const override;
+    QString portCaption(PortType portType, PortIndex portIndex) const override;
 
-  QString
-  portCaption(PortType portType, PortIndex portIndex) const override;
+    QString name() const override;
 
-  QString
-  name() const override;
+  public:
+    QWidget *embeddedWidget() override
+    {
+        return nullptr;
+    }
 
-public:
+    NodeValidationState validationState() const override;
 
-  QWidget *
-  embeddedWidget() override { return nullptr; }
+    QString validationMessage() const override;
 
-  NodeValidationState
-  validationState() const override;
+  private:
+    void restore(const QJsonObject &obj) override;
 
-  QString
-  validationMessage() const override;
+    void outputConnectionCreated(const QtNodes::Connection &c) override;
 
-private:
+    void outputConnectionDeleted(const QtNodes::Connection &c) override;
 
-  void
-  restore(const QJsonObject& obj) override;
+  private:
+    int _indexCounter;
 
-  void
-  outputConnectionCreated(const QtNodes::Connection& c) override;
-
-  void
-  outputConnectionDeleted(const QtNodes::Connection& c) override;
-
-private:
-   int _indexCounter;
-
-   NodeValidationState _modelValidationState = NodeValidationState::Warning;
-   QString _modelValidationError = QString("Missing or incorrect inputs");
+    NodeValidationState _modelValidationState = NodeValidationState::Warning;
+    QString _modelValidationError = QString("Missing or incorrect inputs");
 };

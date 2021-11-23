@@ -4,21 +4,19 @@
 
 class DivisionModel : public MathOperationDataModel
 {
-public:
+  public:
+    QString caption() const override
+    {
+        return QStringLiteral("Division");
+    }
 
-  QString
-  caption() const override
-  { return QStringLiteral("Division"); }
+    QString portCaption(PortType portType, PortIndex portIndex) const override;
 
-  QString
-  portCaption(PortType portType, PortIndex portIndex) const override;
+    QString name() const override
+    {
+        return QStringLiteral("Division");
+    }
 
-  QString
-  name() const override
-  { return QStringLiteral("Division"); }
-
-private:
-
-  void
-  compute() override;
+  private:
+    void compute() override;
 };

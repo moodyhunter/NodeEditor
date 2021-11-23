@@ -1,149 +1,115 @@
 #pragma once
 
-
-#include <QtCore/QObject>
-#include <QtCore/QUuid>
-
-#include <QtCore/QJsonObject>
-
-#include "PortType.hpp"
-
-#include "Export.hpp"
-#include "NodeState.hpp"
-#include "NodeGeometry.hpp"
-#include "NodeData.hpp"
-#include "NodeGraphicsObject.hpp"
 #include "ConnectionGraphicsObject.hpp"
+#include "Export.hpp"
+#include "NodeData.hpp"
+#include "NodeGeometry.hpp"
+#include "NodeGraphicsObject.hpp"
+#include "NodeState.hpp"
+#include "PortType.hpp"
 #include "Serializable.hpp"
 #include "memory.hpp"
+
+#include <QtCore/QJsonObject>
+#include <QtCore/QObject>
+#include <QtCore/QUuid>
 
 namespace QtNodes
 {
 
-class Connection;
-class ConnectionState;
-class NodeGraphicsObject;
-class NodeDataModel;
+    class Connection;
+    class ConnectionState;
+    class NodeGraphicsObject;
+    class NodeDataModel;
 
-class NODE_EDITOR_PUBLIC Node
-  : public QObject
-  , public Serializable
-{
-  Q_OBJECT
+    class NODE_EDITOR_PUBLIC Node
+        : public QObject
+        , public Serializable
+    {
+        Q_OBJECT
 
-public:
+      public:
+        /// NodeDataModel should be an rvalue and is moved into the Node
+        Node(std::unique_ptr<NodeDataModel> &&dataModel);
 
-  /// NodeDataModel should be an rvalue and is moved into the Node
-  Node(std::unique_ptr<NodeDataModel> && dataModel);
+        Node(std::unique_ptr<NodeDataModel> &&dataModel, QUuid &&uuid);
 
-  Node(std::unique_ptr<NodeDataModel> && dataModel, QUuid&& uuid);
+        virtual ~Node();
 
-  virtual
-  ~Node();
+      public:
+        QJsonObject save() const override;
 
-public:
+        void restore(QJsonObject const &json) override;
 
-  QJsonObject
-  save() const override;
+      public:
+        QUuid id() const;
 
-  void
-  restore(QJsonObject const &json) override;
+        void reactToPossibleConnection(PortType, NodeDataType const &, QPointF const &scenePoint);
 
-public:
+        void resetReactionToConnection();
 
-  QUuid
-  id() const;
+      public:
+        NodeGraphicsObject const &nodeGraphicsObject() const;
 
-  void reactToPossibleConnection(PortType,
-                                 NodeDataType const &,
-                                 QPointF const & scenePoint);
+        NodeGraphicsObject &nodeGraphicsObject();
 
-  void
-  resetReactionToConnection();
+        void setGraphicsObject(std::unique_ptr<NodeGraphicsObject> &&graphics);
 
-public:
+        NodeGeometry &nodeGeometry();
 
-  NodeGraphicsObject const &
-  nodeGraphicsObject() const;
+        NodeGeometry const &nodeGeometry() const;
 
-  NodeGraphicsObject &
-  nodeGraphicsObject();
+        NodeState const &nodeState() const;
 
-  void
-  setGraphicsObject(std::unique_ptr<NodeGraphicsObject>&& graphics);
+        NodeState &nodeState();
 
-  NodeGeometry&
-  nodeGeometry();
+        NodeDataModel *nodeDataModel() const;
 
-  NodeGeometry const&
-  nodeGeometry() const;
+      public Q_SLOTS: // data propagation
 
-  NodeState const &
-  nodeState() const;
+        /// Propagates incoming data to the underlying model.
+        void propagateData(PortIndex inPortIndex) const;
 
-  NodeState &
-  nodeState();
+        /// Fetches data from model's OUT #index port
+        /// and propagates it to the connection
+        void onDataUpdated(PortIndex index);
 
-  NodeDataModel*
-  nodeDataModel() const;
+        /// update the graphic part if the size of the embeddedwidget changes
+        void onNodeSizeUpdated();
 
-public Q_SLOTS: // data propagation
+        /// Add the specified port and recalculate position of the connections
+        void onPortAdded(PortType portType, PortIndex index);
 
-  /// Propagates incoming data to the underlying model.
-  void
-  propagateData(PortIndex inPortIndex) const;
+        void onPortMoved(PortType portType, PortIndex oldIndex, PortIndex newIndex);
 
-  /// Fetches data from model's OUT #index port
-  /// and propagates it to the connection
-  void
-  onDataUpdated(PortIndex index);
+        void onPortRemoved(PortType portType, PortIndex index);
 
-  /// update the graphic part if the size of the embeddedwidget changes
-  void
-  onNodeSizeUpdated();
+      Q_SIGNALS:
 
-  /// Add the specified port and recalculate position of the connections
-  void
-  onPortAdded(PortType portType, PortIndex index);
+        void connectionRemoved(Connection &connection);
 
-  void
-  onPortMoved(PortType portType, PortIndex oldIndex, PortIndex newIndex);
+      private:
+        void updateGraphics() const;
 
-  void
-  onPortRemoved(PortType portType, PortIndex index);
+        void insertEntry(PortType portType, PortIndex index);
 
-Q_SIGNALS:
+        void eraseEntry(PortType portType, PortIndex index);
 
-  void
-  connectionRemoved(Connection& connection);
+      private:
+        // addressing
 
-private:
+        QUuid _uid;
 
-  void
-  updateGraphics() const;
+        // data
 
-  void
-  insertEntry(PortType portType, PortIndex index);
+        std::unique_ptr<NodeDataModel> _nodeDataModel;
 
-  void
-  eraseEntry(PortType portType, PortIndex index);
+        NodeState _nodeState;
 
-private:
+        // painting
 
-  // addressing
+        NodeGeometry _nodeGeometry;
 
-  QUuid _uid;
-
-  // data
-
-  std::unique_ptr<NodeDataModel> _nodeDataModel;
-
-  NodeState _nodeState;
-
-  // painting
-
-  NodeGeometry _nodeGeometry;
-
-  std::unique_ptr<NodeGraphicsObject> _nodeGraphicsObject;
-};
-}
+        std::unique_ptr<NodeGraphicsObject> _nodeGraphicsObject;
+    };
+} // namespace QtNodes

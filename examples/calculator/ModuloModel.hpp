@@ -1,87 +1,78 @@
 #pragma once
 
-#include <nodes/NodeDataModel>
-
 #include "IntegerData.hpp"
 
-using QtNodes::PortType;
-using QtNodes::PortIndex;
+#include <nodes/NodeDataModel>
+
 using QtNodes::NodeData;
-using QtNodes::NodeDataType;
 using QtNodes::NodeDataModel;
+using QtNodes::NodeDataType;
 using QtNodes::NodeValidationState;
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 class IntegerData;
 
 class ModuloModel : public NodeDataModel
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-   ModuloModel();
+  public:
+    ModuloModel();
 
-public:
+  public:
+    QString caption() const override
+    {
+        return QStringLiteral("Modulo");
+    }
 
-  QString
-  caption() const override
-  { return QStringLiteral("Modulo"); }
+    bool captionVisible() const override
+    {
+        return true;
+    }
 
-  bool
-  captionVisible() const override
-  { return true; }
+    bool portCaptionVisible(PortType, PortIndex) const override
+    {
+        return true;
+    }
 
-  bool
-  portCaptionVisible(PortType, PortIndex ) const override
-  { return true; }
+    QString portCaption(PortType portType, PortIndex portIndex) const override;
 
-  QString
-  portCaption(PortType portType, PortIndex portIndex) const override;
+    QString name() const override
+    {
+        return QStringLiteral("Modulo");
+    }
 
-  QString
-  name() const override
-  { return QStringLiteral("Modulo"); }
+  public:
+    QJsonObject save() const override;
 
-public:
+  public:
+    unsigned int nPorts(PortType portType) const override;
 
-  QJsonObject
-  save() const override;
+    NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
 
-public:
+    std::shared_ptr<NodeData> outData(PortIndex port) override;
 
-  unsigned int
-  nPorts(PortType portType) const override;
+    void setInData(std::shared_ptr<NodeData>, int) override;
 
-  NodeDataType
-  dataType(PortType portType, PortIndex portIndex) const override;
+    QWidget *embeddedWidget() override
+    {
+        return nullptr;
+    }
 
-  std::shared_ptr<NodeData>
-  outData(PortIndex port) override;
+    NodeValidationState validationState() const override;
 
-  void
-  setInData(std::shared_ptr<NodeData>, int) override;
+    QString validationMessage() const override;
 
-  QWidget *
-  embeddedWidget() override
-  { return nullptr; }
+  private:
+    void compute();
 
-  NodeValidationState
-  validationState() const override;
+  private:
+    std::weak_ptr<IntegerData> _number1;
+    std::weak_ptr<IntegerData> _number2;
 
-  QString
-  validationMessage() const override;
+    std::shared_ptr<IntegerData> _result;
 
-private:
-
-  void
-  compute();
-
-private:
-
-  std::weak_ptr<IntegerData> _number1;
-  std::weak_ptr<IntegerData> _number2;
-
-  std::shared_ptr<IntegerData> _result;
-
-  NodeValidationState modelValidationState = NodeValidationState::Warning;
-  QString modelValidationError = QStringLiteral("Missing or incorrect inputs");
+    NodeValidationState modelValidationState = NodeValidationState::Warning;
+    QString modelValidationError = QStringLiteral("Missing or incorrect inputs");
 };

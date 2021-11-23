@@ -1,65 +1,60 @@
 #pragma once
 
-#include <QtWidgets/QLabel>
-
-#include <nodes/NodeDataModel>
-
 #include "TextData.hpp"
 
-using QtNodes::PortType;
-using QtNodes::PortIndex;
+#include <QtWidgets/QLabel>
+#include <nodes/NodeDataModel>
+
 using QtNodes::NodeData;
 using QtNodes::NodeDataModel;
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 /// The model dictates the number of inputs and outputs for the Node.
 /// In this example it has no logic.
 class TextDisplayDataModel : public NodeDataModel
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  TextDisplayDataModel();
+  public:
+    TextDisplayDataModel();
 
-public:
+  public:
+    QString caption() const override
+    {
+        return QString("Text Display");
+    }
 
-  QString
-  caption() const override
-  { return QString("Text Display"); }
+    bool captionVisible() const override
+    {
+        return false;
+    }
 
-  bool
-  captionVisible() const override { return false; }
+    static QString Name()
+    {
+        return QString("TextDisplayDataModel");
+    }
 
-  static QString
-  Name()
-  { return QString("TextDisplayDataModel"); }
+    QString name() const override
+    {
+        return TextDisplayDataModel::Name();
+    }
 
-  QString
-  name() const override
-  { return TextDisplayDataModel::Name(); }
+  public:
+    unsigned int nPorts(PortType portType) const override;
 
-public:
+    NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
 
-  unsigned int
-  nPorts(PortType portType) const override;
+    std::shared_ptr<NodeData> outData(PortIndex port) override;
 
-  NodeDataType
-  dataType(PortType portType, PortIndex portIndex) const override;
+    void setInData(std::shared_ptr<NodeData> data, int) override;
 
-  std::shared_ptr<NodeData>
-  outData(PortIndex port) override;
+    QWidget *embeddedWidget() override;
 
-  void
-  setInData(std::shared_ptr<NodeData> data, int) override;
+  signals:
 
-  QWidget *
-  embeddedWidget() override;
+    void updateLabel(QString);
 
-signals:
-
-  void
-  updateLabel(QString);
-
-private:
-
-  QLabel * _label;
+  private:
+    QLabel *_label;
 };

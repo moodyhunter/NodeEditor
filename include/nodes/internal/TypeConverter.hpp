@@ -8,14 +8,12 @@
 namespace QtNodes
 {
 
-using SharedNodeData = std::shared_ptr<NodeData>;
+    using SharedNodeData = std::shared_ptr<NodeData>;
 
-// a function taking in NodeData and returning NodeData
-using TypeConverter =
-  std::function<SharedNodeData(SharedNodeData)>;
+    // a function taking in NodeData and returning NodeData
+    using TypeConverter = std::function<SharedNodeData(SharedNodeData)>;
 
-// data-type-in, data-type-out
-using TypeConverterId =
-  std::pair<NodeDataType, NodeDataType>;
+    // data-type-in, data-type-out
+    using TypeConverterId = std::pair<NodeDataType, NodeDataType>;
 
-}
+} // namespace QtNodes

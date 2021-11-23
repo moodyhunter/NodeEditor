@@ -5,18 +5,15 @@
 namespace QtNodes
 {
 
-class Serializable
-{
-public:
+    class Serializable
+    {
+      public:
+        virtual ~Serializable() = default;
 
-  virtual
-  ~Serializable() = default;
+        virtual QJsonObject save() const = 0;
 
-  virtual
-  QJsonObject
-  save() const = 0;
-
-  virtual void
-  restore(QJsonObject const & /*p*/) {}
-};
-}
+        virtual void restore(QJsonObject const & /*p*/)
+        {
+        }
+    };
+} // namespace QtNodes

@@ -2,42 +2,43 @@
 
 #include <nodes/NodeData>
 
-using QtNodes::NodeDataType;
 using QtNodes::NodeData;
+using QtNodes::NodeDataType;
 
 /// The class can potentially incapsulate any user data which
 /// need to be transferred within the Node Editor graph
 class IntegerData : public NodeData
 {
-public:
+  public:
+    IntegerData() : _number(0), _isValid(false)
+    {
+    }
 
-  IntegerData()
-    : _number(0),
-      _isValid(false)
-  {}
+    IntegerData(int number) : _number(number), _isValid(true)
+    {
+    }
 
-  IntegerData(int number)
-    : _number(number),
-       _isValid(true)
-  {}
+    NodeDataType type() const override
+    {
+        return NodeDataType{ "integer", "Integer" };
+    }
 
-  NodeDataType type() const override
-  {
-    return NodeDataType {"integer",
-                         "Integer"};
-  }
+    int number() const
+    {
+        return _number;
+    }
 
-  int number() const
-  { return _number; }
+    QString numberAsText() const
+    {
+        return QString::number(_number);
+    }
 
-  QString numberAsText() const
-  { return QString::number(_number); }
+    bool isValid() const
+    {
+        return _isValid;
+    }
 
-  bool isValid() const
-  { return _isValid; }
-
-private:
-
-  int _number;
-  int _isValid;
+  private:
+    int _number;
+    int _isValid;
 };

@@ -1,73 +1,61 @@
-#include <nodes/NodeData>
-#include <nodes/FlowScene>
-#include <nodes/FlowView>
-#include <nodes/ConnectionStyle>
-#include <nodes/TypeConverter>
+#include "AccumulatorModel.hpp"
+#include "AdditionModel.hpp"
+#include "Converters.hpp"
+#include "DivisionModel.hpp"
+#include "FibonacciModel.hpp"
+#include "MaxModel.hpp"
+#include "MinModel.hpp"
+#include "ModuloModel.hpp"
+#include "MultiplicationModel.hpp"
+#include "NumberDisplayDataModel.hpp"
+#include "NumberSourceDataModel.hpp"
+#include "SubtractionModel.hpp"
 
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QMenuBar>
-
+#include <QtWidgets/QVBoxLayout>
+#include <nodes/ConnectionStyle>
 #include <nodes/DataModelRegistry>
+#include <nodes/FlowScene>
+#include <nodes/FlowView>
+#include <nodes/NodeData>
+#include <nodes/TypeConverter>
 
-#include "NumberSourceDataModel.hpp"
-#include "NumberDisplayDataModel.hpp"
-#include "AdditionModel.hpp"
-#include "SubtractionModel.hpp"
-#include "MultiplicationModel.hpp"
-#include "DivisionModel.hpp"
-#include "ModuloModel.hpp"
-#include "AccumulatorModel.hpp"
-#include "MinModel.hpp"
-#include "MaxModel.hpp"
-#include "FibonacciModel.hpp"
-#include "Converters.hpp"
-
+using QtNodes::ConnectionStyle;
 using QtNodes::DataModelRegistry;
 using QtNodes::FlowScene;
 using QtNodes::FlowView;
-using QtNodes::ConnectionStyle;
 using QtNodes::TypeConverter;
 using QtNodes::TypeConverterId;
 
-static std::shared_ptr<DataModelRegistry>
-registerDataModels()
+static std::shared_ptr<DataModelRegistry> registerDataModels()
 {
-  auto ret = std::make_shared<DataModelRegistry>();
-  ret->registerModel<NumberSourceDataModel>("I/O//Sources");
-  ret->registerModel<NumberDisplayDataModel>("I/O//Displays");
+    auto ret = std::make_shared<DataModelRegistry>();
+    ret->registerModel<NumberSourceDataModel>("I/O//Sources");
+    ret->registerModel<NumberDisplayDataModel>("I/O//Displays");
 
-  ret->registerModel<AdditionModel>("Operators");
-  ret->registerModel<SubtractionModel>("Operators");
-  ret->registerModel<MultiplicationModel>("Operators");
-  ret->registerModel<DivisionModel>("Operators");
-  ret->registerModel<ModuloModel>("Operators");
+    ret->registerModel<AdditionModel>("Operators");
+    ret->registerModel<SubtractionModel>("Operators");
+    ret->registerModel<MultiplicationModel>("Operators");
+    ret->registerModel<DivisionModel>("Operators");
+    ret->registerModel<ModuloModel>("Operators");
 
-  ret->registerModel<AccumulatorModel>("Special");
-  ret->registerModel<MinModel>("Special");
-  ret->registerModel<MaxModel>("Special");
-  ret->registerModel<FibonacciModel>("Special");
+    ret->registerModel<AccumulatorModel>("Special");
+    ret->registerModel<MinModel>("Special");
+    ret->registerModel<MaxModel>("Special");
+    ret->registerModel<FibonacciModel>("Special");
 
-  ret->registerTypeConverter(std::make_pair(DecimalData().type(),
-                                            IntegerData().type()),
-                             TypeConverter{DecimalToIntegerConverter()});
+    ret->registerTypeConverter(std::make_pair(DecimalData().type(), IntegerData().type()), TypeConverter{ DecimalToIntegerConverter() });
 
+    ret->registerTypeConverter(std::make_pair(IntegerData().type(), DecimalData().type()), TypeConverter{ IntegerToDecimalConverter() });
 
-
-  ret->registerTypeConverter(std::make_pair(IntegerData().type(),
-                                            DecimalData().type()),
-                             TypeConverter{IntegerToDecimalConverter()});
-
-  return ret;
+    return ret;
 }
 
-
-static
-void
-setStyle()
+static void setStyle()
 {
-  ConnectionStyle::setConnectionStyle(
-  R"(
+    ConnectionStyle::setConnectionStyle(
+        R"(
   {
     "ConnectionStyle": {
       "ConstructionColor": "gray",
@@ -86,37 +74,33 @@ setStyle()
   )");
 }
 
-
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  QApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-  setStyle();
+    setStyle();
 
-  QWidget mainWidget;
+    QWidget mainWidget;
 
-  auto menuBar    = new QMenuBar();
-  auto saveAction = menuBar->addAction("Save");
-  auto loadAction = menuBar->addAction("Load");
+    auto menuBar = new QMenuBar();
+    auto saveAction = menuBar->addAction("Save");
+    auto loadAction = menuBar->addAction("Load");
 
-  QVBoxLayout *l = new QVBoxLayout(&mainWidget);
+    QVBoxLayout *l = new QVBoxLayout(&mainWidget);
 
-  l->addWidget(menuBar);
-  auto scene = new FlowScene(registerDataModels(), &mainWidget);
-  l->addWidget(new FlowView(scene));
-  l->setContentsMargins(0, 0, 0, 0);
-  l->setSpacing(0);
+    l->addWidget(menuBar);
+    auto scene = new FlowScene(registerDataModels(), &mainWidget);
+    l->addWidget(new FlowView(scene));
+    l->setContentsMargins(0, 0, 0, 0);
+    l->setSpacing(0);
 
-  QObject::connect(saveAction, &QAction::triggered,
-                   scene, &FlowScene::save);
+    QObject::connect(saveAction, &QAction::triggered, scene, &FlowScene::save);
 
-  QObject::connect(loadAction, &QAction::triggered,
-                   scene, &FlowScene::load);
+    QObject::connect(loadAction, &QAction::triggered, scene, &FlowScene::load);
 
-  mainWidget.setWindowTitle("Dataflow tools: simplest calculator");
-  mainWidget.resize(800, 600);
-  mainWidget.showNormal();
+    mainWidget.setWindowTitle("Dataflow tools: simplest calculator");
+    mainWidget.resize(800, 600);
+    mainWidget.showNormal();
 
-  return app.exec();
+    return app.exec();
 }

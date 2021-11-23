@@ -1,25 +1,24 @@
 #pragma once
 
+#include <memory>
 #include <nodes/NodeDataModel>
 
-#include <memory>
-
-using QtNodes::PortType;
-using QtNodes::PortIndex;
 using QtNodes::NodeData;
-using QtNodes::NodeDataType;
 using QtNodes::NodeDataModel;
+using QtNodes::NodeDataType;
 using QtNodes::NodeValidationState;
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 /// The class can potentially incapsulate any user data which
 /// need to be transferred within the Node Editor graph
 class MyNodeData : public NodeData
 {
-public:
-
-  NodeDataType
-  type() const override
-  { return NodeDataType {"MyNodeData", "My Node Data"}; }
+  public:
+    NodeDataType type() const override
+    {
+        return NodeDataType{ "MyNodeData", "My Node Data" };
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -28,35 +27,24 @@ public:
 /// In this example it has no logic.
 class MyDataModel : public NodeDataModel
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
+  public:
+    QString caption() const override;
 
-  QString
-  caption() const override;
+    QString name() const override;
 
-  QString
-  name() const override;
+  public:
+    QJsonObject save() const override;
 
-public:
+  public:
+    unsigned int nPorts(PortType) const override;
 
-  QJsonObject
-  save() const override;
+    NodeDataType dataType(PortType, PortIndex) const override;
 
-public:
+    std::shared_ptr<NodeData> outData(PortIndex) override;
 
-  unsigned int
-  nPorts(PortType) const override;
+    void setInData(std::shared_ptr<NodeData>, int) override;
 
-  NodeDataType
-  dataType(PortType, PortIndex) const override;
-
-  std::shared_ptr<NodeData>
-  outData(PortIndex) override;
-
-  void
-  setInData(std::shared_ptr<NodeData>, int) override;
-
-  QWidget *
-  embeddedWidget() override;
+    QWidget *embeddedWidget() override;
 };

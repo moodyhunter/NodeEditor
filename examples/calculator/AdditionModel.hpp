@@ -4,18 +4,17 @@
 
 class AdditionModel : public MathOperationDataModel
 {
-public:
+  public:
+    QString caption() const override
+    {
+        return QStringLiteral("Addition");
+    }
 
-  QString
-  caption() const override
-  { return QStringLiteral("Addition"); }
+    QString name() const override
+    {
+        return QStringLiteral("Addition");
+    }
 
-  QString
-  name() const override
-  { return QStringLiteral("Addition"); }
-
-private:
-
-  void
-  compute() override;
+  private:
+    void compute() override;
 };

@@ -1,60 +1,44 @@
 #include "models.hpp"
 
-QString
-MyDataModel::
-caption() const
+QString MyDataModel::caption() const
 {
-  return QString("My Data Model");
+    return QString("My Data Model");
 }
 
-QString
-MyDataModel::
-name() const
+QString MyDataModel::name() const
 {
-  return QString("MyDataModel");
+    return QString("MyDataModel");
 }
 
-QJsonObject
-MyDataModel::
-save() const
+QJsonObject MyDataModel::save() const
 {
-  QJsonObject modelJson;
+    QJsonObject modelJson;
 
-  modelJson["name"] = name();
+    modelJson["name"] = name();
 
-  return modelJson;
+    return modelJson;
 }
 
-unsigned int
-MyDataModel::
-nPorts(QtNodes::PortType) const
+unsigned int MyDataModel::nPorts(QtNodes::PortType) const
 {
-  return 3;
+    return 3;
 }
 
-QtNodes::NodeDataType
-MyDataModel::
-dataType(QtNodes::PortType, QtNodes::PortIndex) const
+QtNodes::NodeDataType MyDataModel::dataType(QtNodes::PortType, QtNodes::PortIndex) const
 {
-  return MyNodeData().type();
+    return MyNodeData().type();
 }
 
-std::shared_ptr<QtNodes::NodeData>
-MyDataModel::
-outData(QtNodes::PortIndex)
+std::shared_ptr<QtNodes::NodeData> MyDataModel::outData(QtNodes::PortIndex)
 {
-  return std::make_shared<MyNodeData>();
+    return std::make_shared<MyNodeData>();
 }
 
-void
-MyDataModel::
-setInData(std::shared_ptr<QtNodes::NodeData>, PortIndex)
+void MyDataModel::setInData(std::shared_ptr<QtNodes::NodeData>, PortIndex)
 {
 }
 
-QWidget*
-MyDataModel::
-embeddedWidget()
+QWidget *MyDataModel::embeddedWidget()
 {
-  return nullptr;
+    return nullptr;
 }
