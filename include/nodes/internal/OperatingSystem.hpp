@@ -39,6 +39,9 @@
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 #define NODE_EDITOR_PLATFORM "Unix"
 #define NODE_EDITOR_PLATFORM_UNIX
+#elif defined(__EMSCRIPTEN__)
+#define NODE_EDITOR_PLATFORM "WASM"
+#define NODE_EDITOR_PLATFORM_WASM
 #endif
 
 #ifndef NODE_EDITOR_PLATFORM
