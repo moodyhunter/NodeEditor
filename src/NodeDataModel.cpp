@@ -62,6 +62,11 @@ void NodeDataModel::setNodeStyle(NodeStyle const &style)
     _nodeStyle = style;
 }
 
+void NodeDataModel::setInData(std::shared_ptr<NodeData>, PortIndex)
+{
+    qWarning() << "Node data wasted, override setInData to make it used.";
+}
+
 void NodeDataModel::setInData(std::vector<std::shared_ptr<NodeData>> nodeData, PortIndex port)
 {
     if (portInConnectionPolicy(port) == QtNodes::NodeDataModel::ConnectionPolicy::One)
@@ -73,6 +78,6 @@ void NodeDataModel::setInData(std::vector<std::shared_ptr<NodeData>> nodeData, P
     }
     else
     {
-        Q_ASSERT(false);
+        Q_ASSERT_X(false, "You should override setInData when ConnectionPolicy is Many", Q_FUNC_INFO);
     }
 }

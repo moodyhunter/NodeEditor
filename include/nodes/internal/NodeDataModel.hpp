@@ -99,7 +99,7 @@ namespace QtNodes
 
       public:
         /// Triggers the algorithm
-        virtual void setInData(std::shared_ptr<NodeData> nodeData, PortIndex port) = 0;
+        virtual void setInData(std::shared_ptr<NodeData> nodeData, PortIndex port);
 
         virtual void setInData(std::vector<std::shared_ptr<NodeData>> nodeData, PortIndex port);
 
